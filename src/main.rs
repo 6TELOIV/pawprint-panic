@@ -3,16 +3,30 @@ mod plugin;
 
 use avian3d::{math::*, prelude::*};
 use bevy::prelude::*;
-use plugin::*;
+use plugin::character_controller::*;
 
-use crate::debug::uv_debug_texture;
+use crate::{
+    debug::uv_debug_texture,
+    plugin::camera_controller::{CameraController, CameraControllerPlugin},
+};
 
 fn startup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>,
 ) {
+    let hole_planet_mesh = Mesh3d(
+        asset_server.load(
+            GltfAssetLabel::Primitive {
+                mesh: 0,
+                primitive: 0,
+            }
+            .from_asset("hole_planet.glb"),
+        ),
+    );
+
     // Player
     commands.spawn((
         Mesh3d(meshes.add(Capsule3d::new(1.0, 2.0))),
@@ -20,7 +34,7 @@ fn startup(
             base_color_texture: Some(images.add(uv_debug_texture())),
             ..default()
         })),
-        Transform::from_xyz(0.0, 1.0, 0.0),
+        Transform::from_xyz(0.0, -14.0, 16.0),
         CharacterControllerBundle::new(Collider::sphere(2.0), 9.81 * 2.0).with_movement(
             20.0,
             10.0,
@@ -39,18 +53,19 @@ fn startup(
                     },
                     Vec3::Y,
                 ),
+                CameraController
             )
         ],
     ));
     // Surface
     commands.spawn((
         RigidBody::Static,
-        Mesh3d(meshes.add(Sphere::new(30.0).mesh().uv(64, 48))),
+        hole_planet_mesh,
+        ColliderConstructor::ConvexDecompositionFromMesh,
         MeshMaterial3d(materials.add(StandardMaterial {
             base_color_texture: Some(images.add(uv_debug_texture())),
             ..default()
         })),
-        Collider::sphere(30.0),
         Transform::from_xyz(0.0, -30.0, 0.0),
         GravityField::Sphere(Vec3 {
             x: 0.0,
@@ -75,6 +90,7 @@ fn main() {
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             PhysicsPlugins::default(),
             CharacterControllerPlugin,
+            CameraControllerPlugin,
         ))
         .add_systems(Startup, startup)
         .run();
