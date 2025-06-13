@@ -373,7 +373,7 @@ fn apply_gravity(
         let target_rotation = rotation_to_gravity * transform.rotation;
 
         // Slerp from current to target for smoothness
-        let slerp_speed = 10.0; // Adjust for snappiness
+        let slerp_speed = 20.0;
         transform.rotation = transform
             .rotation
             .slerp(target_rotation, (delta_time as f32) * slerp_speed);

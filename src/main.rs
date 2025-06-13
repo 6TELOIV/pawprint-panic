@@ -60,7 +60,7 @@ fn startup(
     // Surface
     commands.spawn((
         RigidBody::Static,
-        hole_planet_mesh,
+        hole_planet_mesh.clone(),
         ColliderConstructor::ConvexDecompositionFromMesh,
         MeshMaterial3d(materials.add(StandardMaterial {
             base_color_texture: Some(images.add(uv_debug_texture())),
@@ -80,7 +80,7 @@ fn startup(
             shadow_depth_bias: 0.2,
             ..default()
         },
-        Transform::from_xyz(8.0, 16.0, 8.0),
+        Transform::from_xyz(12.0, 16.0, 8.0),
     ));
 }
 
