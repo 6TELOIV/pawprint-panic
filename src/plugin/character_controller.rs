@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use avian3d::{
     math::*,
     prelude::{NarrowPhaseSet, *},
@@ -69,31 +67,18 @@ pub struct GravityAcceleration(Scalar);
 
 /// The gravitational body
 #[derive(Component)]
-pub enum GravityField {
-    Sphere(Vector),
+pub struct GravityField {
+    pub field_type: GravityFieldType,
+    pub priority: u8,
+}
+
+pub enum GravityFieldType {
+    Sphere,
+    HalfPlane,
 }
 
 #[derive(Component)]
 pub struct GravityDirection(Vector);
-
-impl GravityField {
-    fn distance_squared(&self, point: &Vector) -> f32 {
-        match self {
-            GravityField::Sphere(center) => point.distance_squared(*center),
-        }
-    }
-
-    fn cmp(&self, other: &Self, point: &Vector) -> Ordering {
-        self.distance_squared(point)
-            .total_cmp(&other.distance_squared(point))
-    }
-
-    fn gravity_direction(&self, point: &Vector) -> Vector {
-        match self {
-            GravityField::Sphere(center) => (center - point).normalize(),
-        }
-    }
-}
 
 /// The maximum angle a slope can have for a character controller
 /// to be able to climb and jump. If the slope is steeper than this angle,
@@ -174,17 +159,41 @@ impl CharacterControllerBundle {
 
 fn find_gravity_influence(
     mut commands: Commands,
+    collisions: Collisions,
     mut bodies: Query<(Entity, &Transform), With<GravityAcceleration>>,
-    gravity_fields: Query<&GravityField>,
+    gravity_fields: Query<(&GravityField, &Transform)>,
 ) {
-    for (entity, transform) in bodies.iter_mut() {
-        let nearest_field = gravity_fields
-            .iter()
-            .min_by(|a, b| a.cmp(b, &transform.translation));
-        if let Some(nearest_field) = nearest_field {
-            commands.entity(entity).insert(GravityDirection(
-                nearest_field.gravity_direction(&transform.translation),
-            ));
+    for (body, body_transform) in bodies.iter_mut() {
+        let mut field_of_influence = None;
+        for contacts in collisions.collisions_with(body) {
+            let Ok(field) = gravity_fields
+                .get(contacts.collider1)
+                .or_else(|_| gravity_fields.get(contacts.collider2))
+            else {
+                continue;
+            };
+            match field_of_influence {
+                None => {
+                    field_of_influence = Some(field);
+                }
+                Some(current_field) => {
+                    if current_field.0.priority < field.0.priority {
+                        field_of_influence = Some(field);
+                    }
+                }
+            }
+        }
+
+        // set the gravity
+        if let Some((field, field_transform)) = field_of_influence {
+            commands
+                .entity(body)
+                .insert(GravityDirection(match field.field_type {
+                    GravityFieldType::Sphere => {
+                        (field_transform.translation - body_transform.translation).normalize()
+                    }
+                    GravityFieldType::HalfPlane => field_transform.rotation.mul_vec3(Vector::NEG_Y),
+                }));
         }
     }
 }

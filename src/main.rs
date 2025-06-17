@@ -7,7 +7,10 @@ use plugin::character_controller::*;
 
 use crate::{
     debug::uv_debug_texture,
-    plugin::camera_controller::{CameraController, CameraControllerPlugin},
+    plugin::{
+        camera_controller::{CameraController, CameraControllerPlugin},
+        level::LevelPlugin,
+    },
 };
 
 fn startup(
@@ -15,18 +18,7 @@ fn startup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
-    let hole_planet_mesh = Mesh3d(
-        asset_server.load(
-            GltfAssetLabel::Primitive {
-                mesh: 0,
-                primitive: 0,
-            }
-            .from_asset("hole_planet.glb"),
-        ),
-    );
-
     // Player
     commands.spawn((
         Mesh3d(meshes.add(Capsule3d::new(1.0, 2.0))),
@@ -57,22 +49,6 @@ fn startup(
             )
         ],
     ));
-    // Surface
-    commands.spawn((
-        RigidBody::Static,
-        hole_planet_mesh.clone(),
-        ColliderConstructor::ConvexDecompositionFromMesh,
-        MeshMaterial3d(materials.add(StandardMaterial {
-            base_color_texture: Some(images.add(uv_debug_texture())),
-            ..default()
-        })),
-        Transform::from_xyz(0.0, -30.0, 0.0),
-        GravityField::Sphere(Vec3 {
-            x: 0.0,
-            y: -30.0,
-            z: 0.0,
-        }),
-    ));
     // Light
     commands.spawn((
         DirectionalLight {
@@ -91,6 +67,7 @@ fn main() {
             PhysicsPlugins::default(),
             CharacterControllerPlugin,
             CameraControllerPlugin,
+            LevelPlugin,
         ))
         .add_systems(Startup, startup)
         .run();
