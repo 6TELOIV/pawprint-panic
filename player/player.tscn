@@ -1,0 +1,48 @@
+[gd_scene load_steps=9 format=3 uid="uid://dmrbrboe1gohr"]
+
+[ext_resource type="Script" uid="uid://dtk0csr1odr0b" path="res://player/player.gd" id="1_4flbx"]
+[ext_resource type="Material" uid="uid://d0elga02vam2b" path="res://levels/tutorial/assets/material.res" id="2_qjkh3"]
+[ext_resource type="Script" uid="uid://dk0s1tqiq01k5" path="res://player/force_field_detector.gd" id="3_g1dw6"]
+[ext_resource type="Script" uid="uid://deb00dny8lqhc" path="res://player/camera_anchor.gd" id="4_yw30f"]
+[ext_resource type="Script" uid="uid://cl3ddfom2ka18" path="res://player/camera_arm.gd" id="5_qjkh3"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yw30f"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4flbx"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_qjkh3"]
+radius = 0.001
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 0
+floor_snap_length = 0.2
+script = ExtResource("1_4flbx")
+
+[node name="PhysicsCollisionShape" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_yw30f")
+
+[node name="MeshInstance" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_4flbx")
+surface_material_override/0 = ExtResource("2_qjkh3")
+
+[node name="ForceFieldDetector" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("3_g1dw6")
+
+[node name="CollisonShape" type="CollisionShape3D" parent="ForceFieldDetector"]
+shape = SubResource("SphereShape3D_qjkh3")
+
+[node name="CameraAnchor" type="Node3D" parent="."]
+script = ExtResource("4_yw30f")
+
+[node name="CameraArm" type="SpringArm3D" parent="CameraAnchor"]
+spring_length = 20.0
+margin = 0.5
+script = ExtResource("5_qjkh3")
+
+[node name="Camera" type="Camera3D" parent="CameraAnchor/CameraArm"]
+
+[connection signal="area_entered" from="ForceFieldDetector" to="ForceFieldDetector" method="_on_area_entered"]
+[connection signal="area_exited" from="ForceFieldDetector" to="ForceFieldDetector" method="_on_area_exited"]

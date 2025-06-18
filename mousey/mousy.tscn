@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://hexeko0fnxcd"]
+
+[ext_resource type="PackedScene" uid="uid://c321cf3kitbg4" path="res://mousey/mousy.glb" id="1_4p5ca"]
+[ext_resource type="Script" uid="uid://66rval4qiue" path="res://mousey/mousy.gd" id="2_tthms"]
+
+[node name="mousy" instance=ExtResource("1_4p5ca")]
+
+[node name="Mousy" parent="." index="0"]
+script = ExtResource("2_tthms")

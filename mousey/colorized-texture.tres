@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bs67d54qnqjwa"]
+
+[ext_resource type="Texture2D" uid="uid://bniqymgvwfux1" path="res://mousey/mousy_mousy-texture.png" id="1_4xy3h"]
+
+[resource]
+resource_name = "colorized-texture"
+cull_mode = 2
+albedo_texture = ExtResource("1_4xy3h")
