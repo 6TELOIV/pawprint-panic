@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dgiky4a4ecsc1"
-path="res://.godot/imported/mousy.blend-933841cc6d73aaf49cd09b538e8843be.scn"
+path="res://.godot/imported/mousy.blend-3b12f413cace25f999a2453aae80cf57.scn"
 
 [deps]
 
-source_file="res://blender/mousy.blend"
-dest_files=["res://.godot/imported/mousy.blend-933841cc6d73aaf49cd09b538e8843be.scn"]
+source_file="res://mousey/mousy.blend"
+dest_files=["res://.godot/imported/mousy.blend-3b12f413cace25f999a2453aae80cf57.scn"]
 
 [params]
 

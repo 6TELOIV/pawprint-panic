@@ -1,7 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://dmrbrboe1gohr"]
+[gd_scene load_steps=11 format=3 uid="uid://dmrbrboe1gohr"]
 
 [ext_resource type="Script" uid="uid://dtk0csr1odr0b" path="res://player/player.gd" id="1_4flbx"]
-[ext_resource type="Material" uid="uid://d0elga02vam2b" path="res://levels/tutorial/assets/material.res" id="2_qjkh3"]
 [ext_resource type="Script" uid="uid://dk0s1tqiq01k5" path="res://player/force_field_detector.gd" id="3_g1dw6"]
 [ext_resource type="Script" uid="uid://deb00dny8lqhc" path="res://player/camera_anchor.gd" id="4_yw30f"]
 [ext_resource type="Script" uid="uid://cl3ddfom2ka18" path="res://player/camera_arm.gd" id="5_qjkh3"]
@@ -10,8 +9,30 @@
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_4flbx"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yw30f"]
+roughness = 0.6
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 0.25
+rim_enabled = true
+rim = 0.16
+clearcoat = 0.0
+anisotropy_enabled = true
+ao_light_affect = 0.85
+backlight_enabled = true
+refraction_scale = 0.99
+
 [sub_resource type="SphereShape3D" id="SphereShape3D_qjkh3"]
 radius = 0.001
+
+[sub_resource type="Gradient" id="Gradient_yw30f"]
+offsets = PackedFloat32Array(0, 0.537037, 0.622222, 0.911111)
+colors = PackedColorArray(0, 0, 0, 0.980392, 0, 0, 0, 0.980392, 0, 0, 0, 0.067948, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_qjkh3"]
+gradient = SubResource("Gradient_yw30f")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 0
@@ -23,7 +44,7 @@ shape = SubResource("CapsuleShape3D_yw30f")
 
 [node name="MeshInstance" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_4flbx")
-surface_material_override/0 = ExtResource("2_qjkh3")
+surface_material_override/0 = SubResource("StandardMaterial3D_yw30f")
 
 [node name="ForceFieldDetector" type="Area3D" parent="."]
 collision_layer = 0
@@ -44,5 +65,28 @@ script = ExtResource("5_qjkh3")
 
 [node name="Camera" type="Camera3D" parent="CameraAnchor/CameraArm"]
 
+[node name="CoyoteTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+ignore_time_scale = true
+
+[node name="JumpBufferTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+ignore_time_scale = true
+
+[node name="GroundTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+ignore_time_scale = true
+
+[node name="Decal" type="Decal" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -50, 0)
+size = Vector3(1, 100, 1)
+texture_albedo = SubResource("GradientTexture2D_qjkh3")
+
 [connection signal="area_entered" from="ForceFieldDetector" to="ForceFieldDetector" method="_on_area_entered"]
 [connection signal="area_exited" from="ForceFieldDetector" to="ForceFieldDetector" method="_on_area_exited"]
+[connection signal="timeout" from="CoyoteTimer" to="." method="_on_coyote_timer_timeout"]
+[connection signal="timeout" from="JumpBufferTimer" to="." method="_on_jump_buffer_timer_timeout"]
+[connection signal="timeout" from="GroundTimer" to="." method="_on_ground_timer_timeout"]

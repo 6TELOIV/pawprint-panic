@@ -1,16 +1,27 @@
 extends CharacterBody3D
 
 @export var speed := 8.0
-@export var jump_strength := 6.0
+@export var jump_strength := 10.0
+
+## Whether or not the player is in the air from a jump
+var _jumping = false
+## How many jumps have been made in this sequence
+var _jump_count = 0
+## `true` if a jump is buffered that should be processed when the player contacts the ground
+var _jump_buffered = false
+## `true` if the player is currently able to jump
+var _can_jump = false
+
 
 @export var velocity_control_floor := 50.0
 @export var velocity_control_air := 5.0
 
-@export var torque_control_floor := 10.0
-@export var torque_control_air := 1.0
-
 @onready var _force_field_detector: ForceFieldDetector = $ForceFieldDetector
 @onready var _camera_anchor: CameraAnchor = $CameraAnchor
+
+@onready var _coyote_timer: Timer = $CoyoteTimer
+@onready var _ground_timer: Timer = $GroundTimer
+@onready var _jump_buffer_timer: Timer = $JumpBufferTimer
 
 
 static func get_movement_input() -> Vector2:
@@ -62,16 +73,13 @@ func _physics_process(delta: float) -> void:
 
 	# How much control does the player get over the character?
 	var current_velocity_control: float
-	var current_torque_control: float
-	if self.is_on_floor():
+	if is_on_floor():
 		current_velocity_control = velocity_control_floor
-		current_torque_control = torque_control_floor
 	else:
 		current_velocity_control = velocity_control_air
-		current_torque_control = torque_control_air
 	
 	# Jumping
-	self._process_jumping()
+	_process_jumping()
 	
 	# Walking
 	_process_walking(movement_intention, current_velocity_control * delta)
@@ -87,15 +95,79 @@ func _physics_process(delta: float) -> void:
 
 
 func _process_jumping():
-	var up := _force_field_detector.up
+	var up = _force_field_detector.up
+	if is_on_floor() || is_on_wall():
+		# Player can always jump on the floor or walls
+		_can_jump = true
+		# If grounded and in a multi jump sequence, kick off the timer
+		if _jump_count > 0 and _ground_timer.is_stopped():
+			_ground_timer.start()
+	else:
+		# Kick off coyote timer when we leave the ground
+		if _coyote_timer.is_stopped() && _can_jump:
+			_coyote_timer.start()
 	
-	var is_jumping := self.is_on_floor() and Input.is_action_just_pressed("jump")
-	if is_jumping:
-		velocity += up * jump_strength - velocity.project(up)
+	if is_on_wall():
+		# hitting a wall resets your multi jump
+		_jump_count = 0
+
+	# Buffer the jump input to allow for slightly early inputs
+	if !_jump_buffered && Input.is_action_just_pressed("jump"):
+		_jump_buffered = true
+		_jump_buffer_timer.start()
+
+	# If the player can jump and is trying to jump, jump
+	if _can_jump && _jump_buffered:
+		# Clear the input
+		_jump_buffered = false
+
+		# Can't jump until we next land
+		_can_jump = false
+
+		# Cancel the jump timers; the player has jumped so they shouldn't run until the player next lands
+		_ground_timer.stop()
+		_jump_buffer_timer.stop()
+		_coyote_timer.stop()
+
+		# We're now jumping
+		_jumping = true
+
+		# Jump always starts with neutral upwards velocity
+		velocity += -velocity.project(up)
+
+		if is_on_wall():
+			# This is a wall jump
+			velocity += (up + get_wall_normal()) * jump_strength
+		else:
+			# Base jump impulse is modified for double and triple jumps
+			var delta_v = up * jump_strength
+			if _jump_count == 1:
+				delta_v *= 1.25
+			if _jump_count == 2:
+				delta_v *= 1.5
+
+			# Apply the impulse
+			velocity += delta_v
+
+			# Count for double and triple jumps
+			_jump_count = (_jump_count + 1) % 3
+
+
+func _on_coyote_timer_timeout():
+	_can_jump = false
+
+
+func _on_ground_timer_timeout():
+	_jump_count = 0
+
+
+func _on_jump_buffer_timer_timeout():
+	_jump_buffered = false
 
 
 func _process_walking(movement_intention: Vector3, control: float):
 	var up := _force_field_detector.up
+
 	
 	var desired_velocity_change := movement_intention * speed - velocity
 	# Just in case: delete "up" component.
@@ -104,7 +176,7 @@ func _process_walking(movement_intention: Vector3, control: float):
 
 	velocity = velocity.move_toward(
 		velocity + desired_velocity_change,
-		 control
+		control
 	)
 
 

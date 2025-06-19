@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://b5g4gn58yq43d"
-path="res://.godot/imported/tutorial_planet.blend-92062c59d89411afac13cd287bb28bd9.scn"
+path="res://.godot/imported/tutorial_planet.blend-e7884d8062fb0b2514a2ceddd11486a3.scn"
 
 [deps]
 
-source_file="res://blender/tutorial_planet.blend"
-dest_files=["res://.godot/imported/tutorial_planet.blend-92062c59d89411afac13cd287bb28bd9.scn"]
+source_file="res://levels/tutorial/assets/tutorial_planet.blend"
+dest_files=["res://.godot/imported/tutorial_planet.blend-e7884d8062fb0b2514a2ceddd11486a3.scn"]
 
 [params]
 
@@ -32,7 +32,18 @@ animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
-_subresources={}
+_subresources={
+"meshes": {
+"tutorial_planet_Mesh": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"save_to_file/enabled": true,
+"save_to_file/path": "res://levels/tutorial/assets/tutorial_planet_Mesh.res"
+}
+}
+}
 blender/nodes/visible=0
 blender/nodes/active_collection_only=false
 blender/nodes/punctual_lights=true

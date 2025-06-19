@@ -52,8 +52,3 @@ jump={
 
 3d_physics/layer_1="physical_touch"
 3d_physics/layer_2="forcefield"
-
-[rendering]
-
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"

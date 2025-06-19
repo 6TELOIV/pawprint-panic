@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cab4ahh6usc6r"
-path.s3tc="res://.godot/imported/mousy-texture.png-e6960a907881bf20b7d532d1cd21b85c.s3tc.ctex"
+uid="uid://l074f5jpr2d2"
+path.s3tc="res://.godot/imported/wool_material_albedo.png-e56ce3b9bad0ae1014257d7954cf01b9.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://blender/mousy-texture.png"
-dest_files=["res://.godot/imported/mousy-texture.png-e6960a907881bf20b7d532d1cd21b85c.s3tc.ctex"]
+source_file="res://levels/tutorial/assets/wool_material_albedo.png"
+dest_files=["res://.godot/imported/wool_material_albedo.png-e56ce3b9bad0ae1014257d7954cf01b9.s3tc.ctex"]
 
 [params]
 

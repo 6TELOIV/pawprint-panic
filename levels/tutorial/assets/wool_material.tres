@@ -1,0 +1,25 @@
+[gd_resource type="StandardMaterial3D" load_steps=5 format=3 uid="uid://d04rkq4rncyr2"]
+
+[ext_resource type="Texture2D" uid="uid://l074f5jpr2d2" path="res://levels/tutorial/assets/wool_material_albedo.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://6o55xdnyq467" path="res://levels/tutorial/assets/wool_material_orm.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://baekv64mty86u" path="res://levels/tutorial/assets/wool_material_normal.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://d1qc44do5tlxb" path="res://levels/tutorial/assets/wool_material_heightmap.png" id="4"]
+
+[resource]
+albedo_color = Color(0.87, 0.87, 0.87, 1)
+albedo_texture = ExtResource("1")
+roughness_texture = ExtResource("2")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.2
+normal_texture = ExtResource("3")
+rim_enabled = true
+rim = 0.18
+ao_enabled = true
+ao_texture = ExtResource("2")
+heightmap_enabled = true
+heightmap_scale = 0.5
+heightmap_deep_parallax = true
+heightmap_min_layers = 8
+heightmap_max_layers = 32
+heightmap_texture = ExtResource("4")
