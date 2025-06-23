@@ -35,14 +35,14 @@ static func get_movement_input() -> Vector2:
 		return vector
 
 
-static func project_movement_intention(basis: Basis, up: Vector3, movement_input: Vector2) -> Vector3:
+static func project_movement_intention(camera_basis: Basis, up: Vector3, movement_input: Vector2) -> Vector3:
 	if movement_input == Vector2.ZERO:
 		return Vector3.ZERO
 
 	movement_input = movement_input.normalized() * min(movement_input.length(), 1)
 
-	var up_surface = - up.cross(basis.x).normalized()
-	var right_surface = - up.cross(basis.y).normalized()
+	var up_surface = - up.cross(camera_basis.x).normalized()
+	var right_surface = - up.cross(camera_basis.y).normalized()
 	
 	return up_surface * movement_input.y + right_surface * movement_input.x
 
@@ -188,6 +188,6 @@ func _process_turning(delta: float):
 	
 	# Turn the player parallel to the floor and always facing their "horizontal" velocity (orthoganol to up)
 	transform = Transform3D(
-		transform.basis.slerp(Basis.IDENTITY.looking_at(forward - forward.project(up), up), 20 * delta).orthonormalized(),
+		transform.basis.slerp(Basis.looking_at(forward - forward.project(up), up), 20 * delta).orthonormalized(),
 		transform.origin
 	)
