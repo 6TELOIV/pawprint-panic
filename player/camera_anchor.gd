@@ -5,8 +5,6 @@ var target_down: Vector3 = Vector3.DOWN
 var target_origin: Vector3 = Vector3.ZERO
 var adjust_radians_per_second = 0.5
 
-@onready var camera_arm: SpringArm3D = $CameraArm
-
 func _ready() -> void:
 	set_as_top_level(true)
 

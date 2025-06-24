@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bm40gd1b3rrnu" path="res://player/player.blend" id="2_qjkh3"]
 [ext_resource type="Script" uid="uid://dk0s1tqiq01k5" path="res://player/force_field_detector.gd" id="3_g1dw6"]
 [ext_resource type="Script" uid="uid://deb00dny8lqhc" path="res://player/camera_anchor.gd" id="4_yw30f"]
-[ext_resource type="Script" uid="uid://cl3ddfom2ka18" path="res://player/camera_arm.gd" id="5_qjkh3"]
+[ext_resource type="Script" path="res://player/camera_arm.gd" id="5_qjkh3"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yw30f"]
 
@@ -47,7 +47,8 @@ spring_length = 20.0
 margin = 0.5
 script = ExtResource("5_qjkh3")
 
-[node name="Camera" type="Camera3D" parent="CameraAnchor/CameraArm"]
+[node name="PhantomCameraTarget" type="Node3D" parent="CameraAnchor/CameraArm"]
+unique_name_in_owner = true
 
 [node name="CoyoteTimer" type="Timer" parent="."]
 wait_time = 0.1

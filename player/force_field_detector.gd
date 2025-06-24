@@ -4,11 +4,11 @@ class_name ForceFieldDetector extends Area3D
 var _force_fields: Array[ForceField] = []
 
 ## The current acceleration force vector applying to this area
-var acceleration: Vector3 = Vector3.ZERO
+var acceleration: Vector3 = Vector3.DOWN * ForceField.DEFAULT_ACCELERATION
 ## The normalized force vector applying to this area
-var down: Vector3 = Vector3.ZERO
+var down: Vector3 = Vector3.DOWN
 ## The opposite of the normalized force vector applying to this area
-var up: Vector3 = Vector3.ZERO
+var up: Vector3 = Vector3.UP
 
 func _physics_process(_delta: float) -> void:
 	# continue to apply last known forcefield if we fall out of them

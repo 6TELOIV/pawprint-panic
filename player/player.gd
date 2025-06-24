@@ -1,23 +1,24 @@
 extends CharacterBody3D
 
-@export var speed := 8.0
-@export var jump_strength := 10.0
+@export_group("Movement")
+## Velocity of the player's movement
+@export_range(0.0, 100.0, 1, "suffix:m/s", "or_greater") var speed := 8.0
+## Velocity of the player's jump
+@export_range(0.0, 100.0, 1, "suffix:m/s", "or_greater") var jump_strength := 10.0
+## Acceleration (control) on the floor
+@export_range(0.0, 100.0, 1, "suffix:m/s^2", "or_greater") var velocity_control_floor := 50.0
+## Acceleration (control) in the air
+@export_range(0.0, 100.0, 1, "suffix:m/s^2", "or_greater") var velocity_control_air := 5.0
 
-## Whether or not the player is in the air from a jump
-var _jumping = false
-## How many jumps have been made in this sequence
-var _jump_count = 0
-## `true` if a jump is buffered that should be processed when the player contacts the ground
-var _jump_buffered = false
-## `true` if the player is currently able to jump
-var _can_jump = false
+@export_group("Camera")
+## Camera that should point at the player
+@export var player_phantom_camera: PhantomCamera3D
 
 
-@export var velocity_control_floor := 50.0
-@export var velocity_control_air := 5.0
+@onready var _camera_anchor: CameraAnchor = $CameraAnchor
+@onready var _camera_target: Node3D = %PhantomCameraTarget
 
 @onready var _force_field_detector: ForceFieldDetector = $ForceFieldDetector
-@onready var _camera_anchor: CameraAnchor = $CameraAnchor
 
 @onready var _coyote_timer: Timer = $CoyoteTimer
 @onready var _ground_timer: Timer = $GroundTimer
@@ -47,19 +48,22 @@ static func project_movement_intention(camera_basis: Basis, up: Vector3, movemen
 	return up_surface * movement_input.y + right_surface * movement_input.x
 
 
+func _ready() -> void:
+	# Setup the camera
+	player_phantom_camera.set_follow_target(_camera_target)
+	player_phantom_camera.set_look_at_target(_camera_target)
+	player_phantom_camera.set_up_target(_camera_target)
+
+
 func _physics_process(delta: float) -> void:
-	# Update where we are
-	_camera_anchor.target_origin = _force_field_detector.global_transform.origin
-		
 	var acceleration := _force_field_detector.acceleration
-	if acceleration == Vector3.ZERO:
-		# Weeee floating in free space!
-		move_and_slide()
-		return
 	
 	# Because we have it, update where up / down is
-	_camera_anchor.target_down = _force_field_detector.down
 	set_up_direction(_force_field_detector.up)
+
+	# Update CameraAnchor
+	_camera_anchor.target_down = _force_field_detector.down
+	_camera_anchor.target_origin = global_transform.origin
 
 	# What controls is the player inputting?
 	var movement_input := get_movement_input()
@@ -93,6 +97,15 @@ func _physics_process(delta: float) -> void:
 	# ... and turn
 	_process_turning(delta)
 
+
+## Whether or not the player is in the air from a jump
+var _jumping = false
+## How many jumps have been made in this sequence
+var _jump_count = 0
+## `true` if a jump is buffered that should be processed when the player contacts the ground
+var _jump_buffered = false
+## `true` if the player is currently able to jump
+var _can_jump = false
 
 func _process_jumping():
 	var up = _force_field_detector.up
